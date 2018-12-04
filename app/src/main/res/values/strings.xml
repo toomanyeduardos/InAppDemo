@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">InAppDemo</string>
+
+    <string name="current_purchases">Hello!\nYour current purchases are: %1$s</string>
 </resources>

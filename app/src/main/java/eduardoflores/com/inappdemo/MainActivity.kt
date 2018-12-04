@@ -6,6 +6,7 @@ import android.support.v7.widget.DividerItemDecoration
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.util.Log
+import android.widget.TextView
 import com.android.billingclient.api.*
 import kotlinx.android.synthetic.main.activity_main.*
 
@@ -17,9 +18,6 @@ class MainActivity : AppCompatActivity(), PurchasesUpdatedListener {
     val TAG = "MainActivity"
     private lateinit var billingClient: BillingClient
     private lateinit var skuDetails: List<SkuDetails>
-
-    private lateinit var recyclerView: RecyclerView
-    private lateinit var viewAdapter: RecyclerView.Adapter<*>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -54,7 +52,7 @@ class MainActivity : AppCompatActivity(), PurchasesUpdatedListener {
     private fun queryExistingPurchases() {
         billingClient.queryPurchaseHistoryAsync(BillingClient.SkuType.INAPP) { responseCode, purchasesList ->
             if (responseCode == BillingClient.BillingResponse.OK) {
-                Log.d(TAG, "Existing purchases = $purchasesList")
+                hello_tv.text = getString(R.string.current_purchases, purchasesList.toString())
             } else {
                 Log.e(TAG, "Failed to query existing purchases. Response Code = $responseCode")
             }
@@ -102,10 +100,10 @@ class MainActivity : AppCompatActivity(), PurchasesUpdatedListener {
     // list layout elements
     private fun setupRecyclerView(skuDetails: List<SkuDetails>) {
         val viewManager = LinearLayoutManager(this)
-        viewAdapter = ListAdapter(getAvailableItemsFromSdk(skuDetails))
+        val viewAdapter = ListAdapter(getAvailableItemsFromSdk(skuDetails))
         val decoration = DividerItemDecoration(this, DividerItemDecoration.VERTICAL)
 
-        recyclerView = findViewById<RecyclerView>(R.id.items_recycler_view).apply {
+        findViewById<RecyclerView>(R.id.items_recycler_view).apply {/**/
             setHasFixedSize(true)
             layoutManager = viewManager
             addItemDecoration(decoration)
