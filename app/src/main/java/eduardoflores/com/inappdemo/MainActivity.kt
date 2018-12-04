@@ -1,12 +1,11 @@
 package eduardoflores.com.inappdemo
 
-import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
+import android.support.v7.app.AppCompatActivity
+import android.support.v7.widget.DividerItemDecoration
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.util.Log
-import android.view.View
-import android.widget.ListAdapter
 import com.android.billingclient.api.*
 import kotlinx.android.synthetic.main.activity_main.*
 
@@ -17,11 +16,10 @@ import kotlinx.android.synthetic.main.activity_main.*
 class MainActivity : AppCompatActivity(), PurchasesUpdatedListener {
     val TAG = "MainActivity"
     private lateinit var billingClient: BillingClient
-    private lateinit var skuDetails: SkuDetails
+    private lateinit var skuDetails: List<SkuDetails>
 
     private lateinit var recyclerView: RecyclerView
     private lateinit var viewAdapter: RecyclerView.Adapter<*>
-    private lateinit var viewManager: RecyclerView.LayoutManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -30,7 +28,6 @@ class MainActivity : AppCompatActivity(), PurchasesUpdatedListener {
         startBillingClient()
 
         queryBtn.setOnClickListener { queryItems() }
-        buy.setOnClickListener { buyItem() }
     }
 
     private fun startBillingClient() {
@@ -76,19 +73,16 @@ class MainActivity : AppCompatActivity(), PurchasesUpdatedListener {
                 Log.d(TAG, "query details = $skuDetailsList")
 
                 setupRecyclerView(skuDetailsList)
-
-                buy.visibility = View.VISIBLE
-
-                skuDetails = skuDetailsList.first()
+                skuDetails = skuDetailsList
             } else {
                 Log.e(TAG, "Query for details failed")
             }
         }
     }
 
-    private fun buyItem() {
+    fun buyItem(itemPosition: Int) {
         val purchaseParams = BillingFlowParams.newBuilder()
-            .setSkuDetails(skuDetails)
+            .setSkuDetails(skuDetails[itemPosition])
             .build()
 
         val responseCode = billingClient.launchBillingFlow(this, purchaseParams)
@@ -107,12 +101,14 @@ class MainActivity : AppCompatActivity(), PurchasesUpdatedListener {
 
     // list layout elements
     private fun setupRecyclerView(skuDetails: List<SkuDetails>) {
-        viewManager = LinearLayoutManager(this)
+        val viewManager = LinearLayoutManager(this)
         viewAdapter = ListAdapter(getAvailableItemsFromSdk(skuDetails))
+        val decoration = DividerItemDecoration(this, DividerItemDecoration.VERTICAL)
 
         recyclerView = findViewById<RecyclerView>(R.id.items_recycler_view).apply {
             setHasFixedSize(true)
             layoutManager = viewManager
+            addItemDecoration(decoration)
             adapter = viewAdapter
         }
     }

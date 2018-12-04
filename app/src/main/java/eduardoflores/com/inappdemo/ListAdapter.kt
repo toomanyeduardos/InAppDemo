@@ -6,15 +6,17 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import kotlinx.android.synthetic.main.item_row.view.*
 
-class ListAdapter(private val dataset: List<AvailableItem>): RecyclerView.Adapter<ListAdapter.ViewHolder>() {
+class ListAdapter(private val dataSet: List<AvailableItem>): RecyclerView.Adapter<ListAdapter.ViewHolder>() {
+    private lateinit var activity: MainActivity
 
-    class ViewHolder(private val row: ConstraintLayout): RecyclerView.ViewHolder(row) {
+    class ViewHolder(row: ConstraintLayout): RecyclerView.ViewHolder(row) {
         val itemName = row.item_name_tv
         val itemDescription = row.item_description_tv
         val itemPrice = row.item_price
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ListAdapter.ViewHolder {
+        activity = parent.context as MainActivity
         val row = LayoutInflater.from(parent.context).inflate(R.layout.item_row, parent, false)
                 as ConstraintLayout
 
@@ -22,7 +24,10 @@ class ListAdapter(private val dataset: List<AvailableItem>): RecyclerView.Adapte
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val availableItem = dataset[position]
+        val availableItem = dataSet[position]
+        holder.itemView.setOnClickListener {
+            activity.buyItem(position)
+        }
         holder.apply {
             itemName.text = availableItem.title
             itemDescription.text = availableItem.description
@@ -30,5 +35,5 @@ class ListAdapter(private val dataset: List<AvailableItem>): RecyclerView.Adapte
         }
     }
 
-    override fun getItemCount() = dataset.size
+    override fun getItemCount() = dataSet.size
 }
